@@ -1,0 +1,25 @@
+{
+    "name": "Aurelienazerty/DisplayLastPost",
+    "type": "phpbb-extension",
+    "description": "Display the last post of the previous page on the top of viewtopic.",
+    "homepage": "http://www.team-azerty.com",
+    "version": "1.0.0b",
+    "time": "2015-02-14",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Aurelienazerty",
+            "homepage": "http://www.team-azerty.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+   "extra": {
+        "display-name": "Display the last post",
+        "soft-require": {
+            "phpbb/phpbb": "3.1.*"
+        }
+    }
+}
