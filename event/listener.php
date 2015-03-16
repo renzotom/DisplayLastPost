@@ -80,7 +80,7 @@ class listener implements EventSubscriberInterface {
 			while ($line = $this->db->sql_fetchrow($result)) {
 				$new_post_list[] = (int)$line['post_id'];
 			}
-			if (!empty($post_list)) {
+			if (!empty($new_post_list)) {
 				$event['post_list'] = $new_post_list;
 				$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
 				$event['sql_ary'] = $sql_ary;
