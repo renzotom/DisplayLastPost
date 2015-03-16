@@ -75,7 +75,7 @@ class listener implements EventSubscriberInterface {
 				'ORDER_BY'  => 'post_time'
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
-			$result = $this->db->sql_query_limit($sql, $posts_per_page, ($start - 1));
+			$result = $this->db->sql_query_limit($sql, $posts_per_page + 1, ($start - 1));
 			$new_post_list = array();
 			while ($line = $this->db->sql_fetchrow($result)) {
 				$new_post_list[] = (int)$line['post_id'];
