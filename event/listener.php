@@ -52,7 +52,7 @@ class listener implements EventSubscriberInterface {
 	public function modify_first_post_of_the_topic($event) {
 		$start = $event['start'];
 		$current_row_number = $event['current_row_number'];
-		if ($start > 0 && $current_row_number == 0) {
+		if ($this->config['display_last_post_show'] && $start > 0 && $current_row_number == 0) {
 			$this->user->add_lang_ext('Aurelienazerty/DisplayLastPost', 'display_last_post');
 			$post_row = $event['post_row'];
 			$post_row['MESSAGE'] = '<span style="font-weight: bold">' . $this->user->lang['DISPLAY_LAST_POST_TEXT'] . ' : </span><br><br>' . $post_row['MESSAGE'];
