@@ -30,8 +30,8 @@ class listener implements EventSubscriberInterface {
 	 * Constructor
 	 *
 	 * @param \phpbb\db\driver\driver_interface    $db               DBAL object
-	 * @param \phpbb\config\config				  			 $config           Config object
-	 * @param \phpbb\user 												 $user				  	 user object
+	 * @param \phpbb\config\config	$config	Config object
+	 * @param \phpbb\user	$user	user object
 	 * @return \Aurelienazerty\DisplayLastPost\event\listener
 	 * @access public
 	 */
@@ -55,7 +55,7 @@ class listener implements EventSubscriberInterface {
 		if ($this->config['display_last_post_show'] && $start > 0 && $current_row_number == 0) {
 			$this->user->add_lang_ext('Aurelienazerty/DisplayLastPost', 'display_last_post');
 			$post_row = $event['post_row'];
-			$post_row['MESSAGE'] = '<span style="font-weight: bold">' . $this->user->lang['DISPLAY_LAST_POST_TEXT'] . ' : </span><br><br>' . $post_row['MESSAGE'];
+			$post_row['MESSAGE'] = '<p style="font-weight: bold; margin-bottom: 1em;font-size: 1em;">' . $this->user->lang['DISPLAY_LAST_POST_TEXT'] . $this->user->lang['COLON'] . '</p>' . $post_row['MESSAGE'];
 			$event['post_row'] = $post_row;
 		}
 	}
@@ -80,6 +80,7 @@ class listener implements EventSubscriberInterface {
 			while ($line = $this->db->sql_fetchrow($result)) {
 				$new_post_list[] = (int)$line['post_id'];
 			}
+			$this->db->sql_freeresult($result);
 			if (!empty($new_post_list)) {
 				$event['post_list'] = $new_post_list;
 				$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
@@ -94,10 +95,10 @@ class listener implements EventSubscriberInterface {
 			$display_vars = $event['display_vars'];
 			$add_config_var = array(
 				'display_last_post_show'	=> array(
-					'lang' => 'DISPLAY_LAST_POST_SHOW', 
-					'validate' => 'bool', 
-					'type' => 'radio: yes_no', 
-					'explain' => true
+					'lang' => 'DISPLAY_LAST_POST_SHOW',
+					'validate' => 'bool',
+					'type' => 'radio: yes_no',
+					'explain' => true,
 				)
 			);
 			$display_vars['vars'] = phpbb_insert_config_array($display_vars['vars'], $add_config_var, array('after' =>'posts_per_page'));
