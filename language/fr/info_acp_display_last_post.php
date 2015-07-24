@@ -32,6 +32,6 @@ if (empty($lang) || !is_array($lang)) {
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'DISPLAY_LAST_POST_SHOW'			=> 'Reprendre le dernier message',
-	'DISPLAY_LAST_POST_SHOW_EXPLAIN'	=> 'Si activé, affiche le dernier message de la page précédente en haut de la page courante.',
+	'DISPLAY_LAST_POST_SHOW'			=> 'Afficher le dernier message de la page précédente',
+	'DISPLAY_LAST_POST_SHOW_EXPLAIN'		=> 'Si activé, affiche le dernier message de la page précédente en haut de la page courante.',
 ));
