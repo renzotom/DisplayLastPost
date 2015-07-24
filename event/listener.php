@@ -64,8 +64,13 @@ class listener implements EventSubscriberInterface {
 		$topic_data = $event['topic_data'];
 		$start = $event['start'];
 		$sql_ary = $event['sql_ary'];
+		$post_list = $event['post_list'];
 		if ($this->config['display_last_post_show'] && $start > 0) {
 			$posts_per_page = $this->config['posts_per_page'];
+			$new_post_list = array();
+			foreach ($post_list as $key => $value) {
+				$new_post_list[$key+1] = $value;
+			}
 			$sql_array = array(
 				'SELECT'	=> 'p.post_id',
 				'FROM'		=> array(
@@ -75,17 +80,12 @@ class listener implements EventSubscriberInterface {
 				'ORDER_BY'  => 'post_time'
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
-			$result = $this->db->sql_query_limit($sql, $posts_per_page + 1, ($start - 1));
-			$new_post_list = array();
-			while ($line = $this->db->sql_fetchrow($result)) {
-				$new_post_list[] = (int)$line['post_id'];
-			}
+			$result = $this->db->sql_query_limit($sql, 1, $start - 1);
+			$new_post_list[0] = $this->db->sql_fetchrow($result)['post_id'];
 			$this->db->sql_freeresult($result);
-			if (!empty($new_post_list)) {
-				$event['post_list'] = $new_post_list;
-				$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
-				$event['sql_ary'] = $sql_ary;
-			}
+			$event['post_list'] = $new_post_list;
+			$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
+			$event['sql_ary'] = $sql_ary;
 		}
 	}
 
@@ -98,7 +98,7 @@ class listener implements EventSubscriberInterface {
 					'lang' => 'DISPLAY_LAST_POST_SHOW',
 					'validate' => 'bool',
 					'type' => 'radio: yes_no',
-					'explain' => true,
+					'explain' => true
 				)
 			);
 			$display_vars['vars'] = phpbb_insert_config_array($display_vars['vars'], $add_config_var, array('after' =>'posts_per_page'));
