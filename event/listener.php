@@ -25,6 +25,9 @@ class listener implements EventSubscriberInterface {
 
 	/** @var \phpbb\user $user */
 	protected $user;
+	
+	/** @var int */
+	private $last_post_id;
 
 	/**
 	 * Constructor
@@ -51,8 +54,7 @@ class listener implements EventSubscriberInterface {
 	
 	public function modify_first_post_of_the_topic($event) {
 		$start = $event['start'];
-		$current_row_number = $event['current_row_number'];
-		if ($this->config['display_last_post_show'] && $start > 0 && $current_row_number == 0) {
+		if ($this->config['display_last_post_show'] && $start > 0 && $event["post_row"]["POST_ID"] == $this->last_post_id) {
 			$this->user->add_lang_ext('Aurelienazerty/DisplayLastPost', 'display_last_post');
 			$post_row = $event['post_row'];
 			$post_row['MESSAGE'] = '<p style="font-weight: bold; margin-bottom: 1em;font-size: 1em;">' . $this->user->lang['DISPLAY_LAST_POST_TEXT'] . $this->user->lang['COLON'] . '</p>' . $post_row['MESSAGE'];
@@ -81,7 +83,8 @@ class listener implements EventSubscriberInterface {
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
 			$result = $this->db->sql_query_limit($sql, 1, $start - 1);
-			$new_post_list[0] = $this->db->sql_fetchrow($result)['post_id'];
+			$this->last_post_id = $this->db->sql_fetchrow($result)['post_id'];
+			$new_post_list[0] = $this->last_post_id; 
 			$this->db->sql_freeresult($result);
 			$event['post_list'] = $new_post_list;
 			$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
