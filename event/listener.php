@@ -47,7 +47,8 @@ class listener implements EventSubscriberInterface {
 	static public function getSubscribedEvents() {
 		return array(
 			'core.viewtopic_get_post_data'				=> 'modify_viewtopic_post_list',
-			'core.viewtopic_modify_post_row'			=> 'modify_first_post_of_the_topic',
+			//Modified priority for FirstPostOnEveryPage ext compatibility.
+			'core.viewtopic_modify_post_row'			=> array('modify_first_post_of_the_topic', -2710),
 			'core.acp_board_config_edit_add'			=> 'acp_board_post_config',
 		);
 	}
