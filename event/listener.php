@@ -25,6 +25,9 @@ class listener implements EventSubscriberInterface {
 
 	/** @var \phpbb\user $user */
 	protected $user;
+	
+	/** @var int */
+	private $last_post_id;
 
 	/**
 	 * Constructor
@@ -44,15 +47,15 @@ class listener implements EventSubscriberInterface {
 	static public function getSubscribedEvents() {
 		return array(
 			'core.viewtopic_get_post_data'				=> 'modify_viewtopic_post_list',
-			'core.viewtopic_modify_post_row'			=> 'modify_first_post_of_the_topic',
+			//Modified priority for FirstPostOnEveryPage ext compatibility.
+			'core.viewtopic_modify_post_row'			=> array('modify_first_post_of_the_topic', -2710),
 			'core.acp_board_config_edit_add'			=> 'acp_board_post_config',
 		);
 	}
 	
 	public function modify_first_post_of_the_topic($event) {
 		$start = $event['start'];
-		$current_row_number = $event['current_row_number'];
-		if ($this->config['display_last_post_show'] && $start > 0 && $current_row_number == 0) {
+		if ($this->config['display_last_post_show'] && $start > 0 && $event["post_row"]["POST_ID"] == $this->last_post_id) {
 			$this->user->add_lang_ext('Aurelienazerty/DisplayLastPost', 'display_last_post');
 			$post_row = $event['post_row'];
 			$post_row['MESSAGE'] = '<p style="font-weight: bold; margin-bottom: 1em;font-size: 1em;">' . $this->user->lang['DISPLAY_LAST_POST_TEXT'] . $this->user->lang['COLON'] . '</p>' . $post_row['MESSAGE'];
@@ -64,8 +67,13 @@ class listener implements EventSubscriberInterface {
 		$topic_data = $event['topic_data'];
 		$start = $event['start'];
 		$sql_ary = $event['sql_ary'];
+		$post_list = $event['post_list'];
 		if ($this->config['display_last_post_show'] && $start > 0) {
 			$posts_per_page = $this->config['posts_per_page'];
+			$new_post_list = array();
+			foreach ($post_list as $key => $value) {
+				$new_post_list[$key+1] = $value;
+			}
 			$sql_array = array(
 				'SELECT'	=> 'p.post_id',
 				'FROM'		=> array(
@@ -75,17 +83,13 @@ class listener implements EventSubscriberInterface {
 				'ORDER_BY'  => 'post_time'
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
-			$result = $this->db->sql_query_limit($sql, $posts_per_page + 1, ($start - 1));
-			$new_post_list = array();
-			while ($line = $this->db->sql_fetchrow($result)) {
-				$new_post_list[] = (int)$line['post_id'];
-			}
+			$result = $this->db->sql_query_limit($sql, 1, $start - 1);
+			$this->last_post_id = $this->db->sql_fetchrow($result)['post_id'];
+			$new_post_list[0] = $this->last_post_id; 
 			$this->db->sql_freeresult($result);
-			if (!empty($new_post_list)) {
-				$event['post_list'] = $new_post_list;
-				$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
-				$event['sql_ary'] = $sql_ary;
-			}
+			$event['post_list'] = $new_post_list;
+			$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
+			$event['sql_ary'] = $sql_ary;
 		}
 	}
 
@@ -98,7 +102,7 @@ class listener implements EventSubscriberInterface {
 					'lang' => 'DISPLAY_LAST_POST_SHOW',
 					'validate' => 'bool',
 					'type' => 'radio: yes_no',
-					'explain' => true,
+					'explain' => true
 				)
 			);
 			$display_vars['vars'] = phpbb_insert_config_array($display_vars['vars'], $add_config_var, array('after' =>'posts_per_page'));
