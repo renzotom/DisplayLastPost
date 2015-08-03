@@ -2,7 +2,7 @@
 /**
  *
  * Display Last Post extension for the phpBB Forum Software package.
- * Swedish translation by Holger (https://www.maskinisten.net)
+ * Swedish transaltion be Holger (https://www.maskinisten.net)
  *
  * @copyright (c) 2013 phpBB Limited <https://www.phpbb.com>
  * @license GNU General Public License, version 2 (GPL-2.0)
@@ -35,5 +35,6 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'DISPLAY_LAST_POST_TEXT'			=> 'Sista inlägget från föregående sida',
+	'DISPLAY_LAST_POST_SHOW'			=> 'Visa sista inlägget',
+	'DISPLAY_LAST_POST_SHOW_EXPLAIN'	=> 'Aktiveras detta så visas det sista inlägget från föregående sida i början av viewtopic.',
 ));
