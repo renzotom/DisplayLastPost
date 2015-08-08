@@ -87,7 +87,7 @@ class listener implements EventSubscriberInterface
 					POSTS_TABLE	=> 'p',
 				),
 				'WHERE' => 'p.topic_id = ' . (int) $topic_data['topic_id'],
-				'ORDER_BY'  => 'post_time'
+				'ORDER_BY'  => 'p.post_time'
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
 			$result = $this->db->sql_query_limit($sql, 1, $start - 1);
