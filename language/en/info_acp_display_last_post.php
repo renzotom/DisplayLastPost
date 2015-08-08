@@ -35,5 +35,5 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	'DISPLAY_LAST_POST_SHOW'		=> 'Display the latest post of the previous page',
-	'DISPLAY_LAST_POST_SHOW_EXPLAIN'	=> 'If enabled, display the lastest post of the previous page on the top of viewtopic.',
+	'DISPLAY_LAST_POST_SHOW_EXPLAIN'	=> 'If enabled, display the latest post of the previous page on the top of viewtopic.',
 ));
