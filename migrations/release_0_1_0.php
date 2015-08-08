@@ -10,13 +10,16 @@
 
 namespace Aurelienazerty\DisplayLastPost\migrations;
 
-class release_0_1_0 extends \phpbb\db\migration\migration {
+class release_0_1_0 extends \phpbb\db\migration\migration 
+{
 	
-	public function effectively_installed() {
+	public function effectively_installed() 
+	{
 		return !empty($this->config['display_last_post_show']);
 	}
 
-	public function update_data() {
+	public function update_data() 
+	{
 		return array(
 			array(
 				'config.add', array('display_last_post_show', 1)
