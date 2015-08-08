@@ -34,5 +34,5 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'DISPLAY_LAST_POST_TEXT'			=> 'Lastest post of the previous page',
+	'DISPLAY_LAST_POST_TEXT'			=> 'Latest post of the previous page',
 ));
