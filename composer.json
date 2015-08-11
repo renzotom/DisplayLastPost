@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Display the lastest post of the previous page on the top of viewtopic.",
     "homepage": "http://www.team-azerty.com",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "time": "2015-08-03",
     "keywords": ["phpbb", "extension", "post"],
     "license": "GPL-2.0",
@@ -18,7 +18,7 @@
         "php": ">=5.3.3"
     },
    "extra": {
-        "display-name": "Display the latest post from the previous page",
+        "display-name": "Display Last Post",
         "soft-require": {
             "phpbb/phpbb": "3.1.*"
         },
