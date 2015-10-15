@@ -1,2 +1,3 @@
 # Display Last Post
-Mod pour phpBB 3.1.x permettant de reprendre le dernier message sur toutes les pages
+
+phpBB 3.1.x extension who display the latest post of the previous page on the top of viewtopic.
