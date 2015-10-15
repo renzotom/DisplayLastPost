@@ -3,8 +3,8 @@
     "type": "phpbb-extension",
     "description": "Display the lastest post of the previous page on the top of viewtopic.",
     "homepage": "http://www.team-azerty.com",
-    "version": "1.1.2",
-    "time": "2015-08-03",
+    "version": "1.1.3",
+    "time": "2015-10-15",
     "keywords": ["phpbb", "extension", "post"],
     "license": "GPL-2.0",
     "authors": [
