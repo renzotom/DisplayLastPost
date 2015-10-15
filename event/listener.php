@@ -95,7 +95,7 @@ class listener implements EventSubscriberInterface
 			$new_post_list[0] = $this->last_post_id; 
 			$this->db->sql_freeresult($result);
 			$event['post_list'] = $new_post_list;
-			$sql_ary['WHERE'] = 'p.post_id IN (' . implode(', ', $new_post_list) . ') AND u.user_id = p.poster_id';
+			$sql_ary['WHERE'] = $db->sql_in_set('p.post_id', $new_post_list) . ' AND u.user_id = p.poster_id';
 			$event['sql_ary'] = $sql_ary;
 		}
 	}
