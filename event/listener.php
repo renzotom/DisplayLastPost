@@ -46,6 +46,13 @@ class listener implements EventSubscriberInterface
 		$this->db = $db;
 	}
 
+	/**
+	 * Assign functions defined in this class to event listeners in the core
+	 *
+	 * @return array
+	 * @static
+	 * @access public
+	 */
 	static public function getSubscribedEvents()
 	{
 		return array(
@@ -55,6 +62,15 @@ class listener implements EventSubscriberInterface
 		);
 	}
 	
+	/**
+	 * Modify the firt post of the topic 
+	 * (only if it's not the first page)
+	 *
+	 * @param object $event The event object
+	 *
+	 * @return null
+	 * @access public
+	 */
 	public function modify_first_post_of_the_topic($event)
 	{
 		$start = $event['start'];
@@ -67,6 +83,15 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
+	/**
+	 * Modify the list of post, to add the previous post of the lastest page
+	 * (only if it's not the first page)
+	 *
+	 * @param object $event The event object
+	 *
+	 * @return null
+	 * @access public
+	 */
 	public function modify_viewtopic_post_list($event)
 	{
 		$topic_data = $event['topic_data'];
@@ -100,7 +125,14 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	// ACP functions
+	/**
+	 * ACP fonction : Adding radio in the post config to switch on/off "Display Last Post" feature
+	 *
+	 * @param object $event The event object
+	 *
+	 * @return null
+	 * @access public
+	 */
 	public function acp_board_post_config($event)
 	{
 		if ($event['mode'] == 'post')
@@ -118,5 +150,4 @@ class listener implements EventSubscriberInterface
 			$event['display_vars'] = array('title' => $display_vars['title'], 'vars' => $display_vars['vars']);
 		}
 	}
-	// ACP functions
 }
