@@ -116,7 +116,9 @@ class listener implements EventSubscriberInterface
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
 			$result = $this->db->sql_query_limit($sql, 1, $start - 1);
-			$this->last_post_id = $this->db->sql_fetchrow($result)['post_id'];
+			//Array dereferencing only for php >= 5.4
+			$fetchrow = $this->db->sql_fetchrow($result);
+			$this->last_post_id = $fetchrow['post_id'];
 			$new_post_list[0] = $this->last_post_id; 
 			$this->db->sql_freeresult($result);
 			$event['post_list'] = $new_post_list;
