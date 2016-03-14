@@ -100,7 +100,6 @@ class listener implements EventSubscriberInterface
 		$post_list = $event['post_list'];
 		if ($this->config['display_last_post_show'] && $start > 0)
 		{
-			$posts_per_page = $this->config['posts_per_page'];
 			$new_post_list = array();
 			foreach ($post_list as $key => $value)
 			{
@@ -111,16 +110,16 @@ class listener implements EventSubscriberInterface
 				'FROM'		=> array(
 					POSTS_TABLE	=> 'p',
 				),
-				'WHERE' => 'p.topic_id = ' . (int) $topic_data['topic_id'],
-				'ORDER_BY'  => 'p.post_time'
+				'WHERE' => 'p.topic_id = ' . (int) $topic_data['topic_id'] . ' AND p.post_id < ' . (int) $post_list[0] . ' AND post_visibility =  1',
+				'ORDER_BY' => 'p.post_id DESC'
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
-			$result = $this->db->sql_query_limit($sql, 1, $start - 1);
+			$result = $this->db->sql_query_limit($sql, 1);
 			//Array dereferencing only for php >= 5.4
 			$fetchrow = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
 			$this->last_post_id = $fetchrow['post_id'];
 			$new_post_list[0] = $this->last_post_id; 
-			$this->db->sql_freeresult($result);
 			$event['post_list'] = $new_post_list;
 			$sql_ary['WHERE'] = $this->db->sql_in_set('p.post_id', $new_post_list) . ' AND u.user_id = p.poster_id';
 			$event['sql_ary'] = $sql_ary;
