@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
-	
+
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
 
@@ -26,7 +26,7 @@ class listener implements EventSubscriberInterface
 
 	/** @var \phpbb\user $user */
 	protected $user;
-	
+
 	/** @var int */
 	private $last_post_id;
 
@@ -61,9 +61,9 @@ class listener implements EventSubscriberInterface
 			'core.acp_board_config_edit_add'	=> 'acp_board_post_config',
 		);
 	}
-	
+
 	/**
-	 * Modify the firt post of the topic 
+	 * Modify the firt post of the topic
 	 * (only if it's not the first page)
 	 *
 	 * @param object $event The event object
@@ -106,12 +106,18 @@ class listener implements EventSubscriberInterface
 				$new_post_list[$key+1] = $value;
 			}
 			$sql_array = array(
-				'SELECT'	=> 'p.post_id',
+				'SELECT'	=> 'p2.post_id',
 				'FROM'		=> array(
 					POSTS_TABLE	=> 'p',
 				),
-				'WHERE' => 'p.topic_id = ' . (int) $topic_data['topic_id'] . ' AND p.post_id < ' . (int) $post_list[0] . ' AND post_visibility =  1',
-				'ORDER_BY' => 'p.post_id DESC'
+				'LEFT_JOIN' => array(
+					array(
+						'FROM'  => array(POSTS_TABLE => 'p2'),
+						'ON'    => ' p2.topic_id = ' . (int) $topic_data['topic_id'] . ' AND p2.post_time < p.post_time AND p2.post_visibility = 1',
+					)
+				),
+				'WHERE' => 'p.post_id = ' . (int) $post_list[0],
+				'ORDER_BY' => 'p2.post_time DESC'
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
 			$result = $this->db->sql_query_limit($sql, 1);
@@ -119,7 +125,7 @@ class listener implements EventSubscriberInterface
 			$fetchrow = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
 			$this->last_post_id = $fetchrow['post_id'];
-			$new_post_list[0] = $this->last_post_id; 
+			$new_post_list[0] = $this->last_post_id;
 			$event['post_list'] = $new_post_list;
 			$sql_ary['WHERE'] = $this->db->sql_in_set('p.post_id', $new_post_list) . ' AND u.user_id = p.poster_id';
 			$event['sql_ary'] = $sql_ary;
