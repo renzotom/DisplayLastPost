@@ -1,17 +1,35 @@
 {
     "name": "Aurelienazerty/DisplayLastPost",
     "type": "phpbb-extension",
-    "description": "Display the lastest post of the previous page on the top of viewtopic.",
+    "description": "Extension which displays the lastest post of the previous page on the top of viewtopic.",
     "homepage": "http://www.team-azerty.com",
     "version": "1.1.6",
-    "time": "2016-03-04",
+    "time": "2016-03-31",
     "keywords": ["phpbb", "extension", "post"],
     "license": "GPL-2.0",
     "authors": [
         {
             "name": "Aurelienazerty",
             "homepage": "http://www.team-azerty.com",
-            "role": "Developer"
+            "role": "Main developer"
+        },
+		{
+            "name": "Théonaute",
+			"homepage": "http://www.phpbb-fr.com/",
+            "role": "phpBB 3.0.x initial MOD developer"
+        },
+		{
+            "name": "Kyosuke",
+            "role": "Developer contributor"
+        },
+		{
+            "name": "Raul [ThE KuKa]",
+			"homepage": "http://www.raularroyomonzo.es/",
+            "role": "Spanish Translator"
+        },
+		{
+            "name": "HenLen",
+            "role": "German Translator"
         }
     ],
     "require": {
