@@ -105,6 +105,50 @@ class listener implements EventSubscriberInterface
 			{
 				$new_post_list[$key+1] = $value;
 			}
+			
+			$join_user_sql = array('a' => true, 't' => false, 's' => false);
+			
+			$default_sort_days	= (!empty($user->data['user_post_show_days'])) ? $user->data['user_post_show_days'] : 0;
+			$default_sort_key	= (!empty($user->data['user_post_sortby_type'])) ? $user->data['user_post_sortby_type'] : 't';
+			$default_sort_dir	= (!empty($user->data['user_post_sortby_dir'])) ? $user->data['user_post_sortby_dir'] : 'a';
+			
+			$sort_days	= request_var('st', $default_sort_days);
+			$sort_key	= request_var('sk', $default_sort_key);
+			$sort_dir	= request_var('sd', $default_sort_dir);
+			
+			if ($min_post_time) 
+			{
+				$min_post_time = time() - ($sort_days * 86400);
+				$limit_posts_time = "AND p.post_time >= $min_post_time ";
+			}
+			else
+			{
+				$limit_posts_time = '';
+			}
+			
+			if ($sort_dir == 'a')
+			{
+				$sort = '<';
+			}
+			else
+			{
+				$sort = '>';
+			}
+			
+			$from_array = array(POSTS_TABLE => 'p2');
+			$joinUser = '';
+			if ($join_user_sql[$sort_key])
+			{
+				 $from_array[USERS_TABLE] = 'u';
+				 $join_user = 'AND u.user_id = p2.poster_id ';
+				 $last_post = 'AND p2.poster_id ' . $sort . ' p.poster_id ';
+			}
+			else
+			{
+				$last_post = 'AND p2.post_time ' . $sort . ' p.post_time ';
+			}
+
+			
 			$sql_array = array(
 				'SELECT'	=> 'p2.post_id',
 				'FROM'		=> array(
@@ -112,8 +156,10 @@ class listener implements EventSubscriberInterface
 				),
 				'LEFT_JOIN' => array(
 					array(
-						'FROM'  => array(POSTS_TABLE => 'p2'),
-						'ON'    => ' p2.topic_id = ' . (int) $topic_data['topic_id'] . ' AND p2.post_time < p.post_time AND p2.post_visibility = 1',
+						'FROM'  => $from_array,
+						'ON'    => ' p2.topic_id = ' . (int) $topic_data['topic_id'] . '
+							AND p2.post_visibility = 1 ' . 
+							$last_post . $join_user . $limit_posts_time,
 					)
 				),
 				'WHERE' => 'p.post_id = ' . (int) $post_list[0],
