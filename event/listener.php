@@ -98,6 +98,7 @@ class listener implements EventSubscriberInterface
 		$start = $event['start'];
 		$sql_ary = $event['sql_ary'];
 		$post_list = $event['post_list'];
+		$request = new \phpbb\request\request();
 		if ($this->config['display_last_post_show'] && $start > 0)
 		{
 			$new_post_list = array();
@@ -112,9 +113,9 @@ class listener implements EventSubscriberInterface
 			$default_sort_key	= (!empty($user->data['user_post_sortby_type'])) ? $user->data['user_post_sortby_type'] : 't';
 			$default_sort_dir	= (!empty($user->data['user_post_sortby_dir'])) ? $user->data['user_post_sortby_dir'] : 'a';
 			
-			$sort_days	= request_var('st', $default_sort_days);
-			$sort_key	= request_var('sk', $default_sort_key);
-			$sort_dir	= request_var('sd', $default_sort_dir);
+			$sort_days	= $request->variable('st', $default_sort_days);
+			$sort_key	= $request->variable('sk', $default_sort_key);
+			$sort_dir	= $request->variable('sd', $default_sort_dir);
 			
 			if ($min_post_time) 
 			{
