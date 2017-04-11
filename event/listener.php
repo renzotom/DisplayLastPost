@@ -36,14 +36,16 @@ class listener implements EventSubscriberInterface
 	 * @param \phpbb\db\driver\driver_interface    $db               DBAL object
 	 * @param \phpbb\config\config	$config	Config object
 	 * @param \phpbb\user	$user	user object
+	 * @param \phpbb\request\request $request request object
 	 * @return \Aurelienazerty\DisplayLastPost\event\listener
 	 * @access public
 	 */
-	public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\config\config $config, \phpbb\user $user)
+	public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\config\config $config, \phpbb\user $user, \phpbb\request\request $request)
 	{
-		$this->user = $user;
-		$this->config = $config;
 		$this->db = $db;
+		$this->config = $config;
+		$this->user = $user;
+		$this->request = $request;
 	}
 
 	/**
@@ -98,7 +100,6 @@ class listener implements EventSubscriberInterface
 		$start = $event['start'];
 		$sql_ary = $event['sql_ary'];
 		$post_list = $event['post_list'];
-		$request = new \phpbb\request\request();
 		if ($this->config['display_last_post_show'] && $start > 0)
 		{
 			$new_post_list = array();
@@ -109,15 +110,15 @@ class listener implements EventSubscriberInterface
 			
 			$join_user_sql = array('a' => true, 't' => false, 's' => false);
 			
-			$default_sort_days	= (!empty($user->data['user_post_show_days'])) ? $user->data['user_post_show_days'] : 0;
-			$default_sort_key	= (!empty($user->data['user_post_sortby_type'])) ? $user->data['user_post_sortby_type'] : 't';
-			$default_sort_dir	= (!empty($user->data['user_post_sortby_dir'])) ? $user->data['user_post_sortby_dir'] : 'a';
+			$default_sort_days	= (!empty($this->user->data['user_post_show_days'])) ? $this->user->data['user_post_show_days'] : 0;
+			$default_sort_key	= (!empty($this->user->data['user_post_sortby_type'])) ? $this->user->data['user_post_sortby_type'] : 't';
+			$default_sort_dir	= (!empty($this->user->data['user_post_sortby_dir'])) ? $this->user->data['user_post_sortby_dir'] : 'a';
 			
-			$sort_days	= $request->variable('st', $default_sort_days);
-			$sort_key	= $request->variable('sk', $default_sort_key);
-			$sort_dir	= $request->variable('sd', $default_sort_dir);
+			$sort_days	= $this->request->variable('st', $default_sort_days);
+			$sort_key	= $this->request->variable('sk', $default_sort_key);
+			$sort_dir	= $this->request->variable('sd', $default_sort_dir);
 			
-			if ($min_post_time) 
+			if ($sort_days) 
 			{
 				$min_post_time = time() - ($sort_days * 86400);
 				$limit_posts_time = "AND p.post_time >= $min_post_time ";
@@ -130,41 +131,44 @@ class listener implements EventSubscriberInterface
 			if ($sort_dir == 'a')
 			{
 				$sort = '<';
+				$order = 'DESC';
 			}
 			else
 			{
 				$sort = '>';
+				$order = 'ASC';
 			}
 			
-			$from_array = array(POSTS_TABLE => 'p2');
-			$joinUser = '';
+			$from_array = array(POSTS_TABLE	=> 'p');
+			$join_array = array(POSTS_TABLE => 'p2');
+			$join_user = '';
 			if ($join_user_sql[$sort_key])
 			{
 				 $from_array[USERS_TABLE] = 'u';
-				 $join_user = 'AND u.user_id = p2.poster_id ';
-				 $last_post = 'AND p2.poster_id ' . $sort . ' p.poster_id ';
+				 $join_user = ' AND u.user_id = p2.poster_id ';
+				 $last_post = ' AND p2.post_time ' . $sort . ' p.post_time ';
+				 $order_by = 'p2.poster_id' . ' ' . $order . ', p2.post_time DESC';
+				 $order = '';
 			}
 			else
 			{
 				$last_post = 'AND p2.post_time ' . $sort . ' p.post_time ';
+				$order_by = 'p2.post_time';
 			}
-
 			
 			$sql_array = array(
 				'SELECT'	=> 'p2.post_id',
-				'FROM'		=> array(
-					POSTS_TABLE	=> 'p',
-				),
+				'FROM'		=> $from_array,
 				'LEFT_JOIN' => array(
 					array(
-						'FROM'  => $from_array,
+						'FROM'  => $join_array,
 						'ON'    => ' p2.topic_id = ' . (int) $topic_data['topic_id'] . '
 							AND p2.post_visibility = 1 ' . 
 							$last_post . $join_user . $limit_posts_time,
 					)
 				),
-				'WHERE' => 'p.post_id = ' . (int) $post_list[0],
-				'ORDER_BY' => 'p2.post_time DESC'
+				'WHERE' => 'p.post_id = ' . (int) $post_list[0] . ' AND p2.post_id IS NOT NULL',
+				'ORDER_BY' => $order_by . ' ' . $order
 			);
 			$sql = $this->db->sql_build_query('SELECT', $sql_array);
 			$result = $this->db->sql_query_limit($sql, 1);
